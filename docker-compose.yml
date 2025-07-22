@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:15
+    image: postgres
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: pass
@@ -9,10 +9,18 @@ services:
       - "5432:5432"
 
   mongo:
-    image: mongo:7
+    image: mongo
     command: ["--bind_ip_all", "--port", "27017"]
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: pass
     ports:
       - "27017:27017"
+
+  MySql:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+    ports:
+      - "3306:3306"
