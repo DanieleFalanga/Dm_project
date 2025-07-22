@@ -1,3 +1,4 @@
 data/*
 data/artists.csv
 data/tracks.csv
+  .DS_Store
