@@ -4,3 +4,5 @@ mongo/init/tracks.csv
 mongo/init/artists.csv
 mongo/data/*
 mysql/data/*
+mysql/init/script.py
+genres.csv

@@ -1,9 +1,22 @@
 CREATE TABLE artists (
   id         VARCHAR(25) PRIMARY KEY,
   followers  INT,
-  genres     TEXT,          -- era JSON
+  genres     JSON ,          -- era JSON
   name       VARCHAR(255),
   popularity INT
+);
+
+CREATE TABLE genres (
+  id         VARCHAR(255) PRIMARY KEY,
+  name       VARCHAR(25)
+);
+
+CREATE TABLE artist_genres (
+  artist_id           VARCHAR(255),
+  genre_id            VARCHAR(255),
+  PRIMARY KEY (artist_id, genre_id),
+  FOREIGN KEY (artist_id) REFERENCES artists(id),
+  FOREIGN KEY (genre_id)  REFERENCES genres(id)
 );
 
 CREATE TABLE tracks (
@@ -12,8 +25,8 @@ CREATE TABLE tracks (
   popularity       INT,
   duration_ms      INT,
   explicit         TINYINT,
-  artists          TEXT,     -- era JSON
-  id_artists       TEXT,     -- era JSON
+  artists          JSON,     -- era JSON
+  id_artists       JSON,     -- era JSON
   release_date     DATE,
   danceability     FLOAT,
   energy           FLOAT,

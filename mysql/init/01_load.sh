@@ -14,10 +14,10 @@ IGNORE 1 ROWS;
 SQL
 
 # importa tracks.csv
-mysql --local-infile=1 -u root -p"$MYSQL_ROOT_PASSWORD" spotify <<'SQL'
-LOAD DATA LOCAL INFILE '/docker-entrypoint-initdb.d/tracks.csv'
-INTO TABLE tracks
-FIELDS TERMINATED BY ',' ENCLOSED BY '"' 
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS;
-SQL
+# mysql --local-infile=1 -u root -p"$MYSQL_ROOT_PASSWORD" spotify <<'SQL'
+# LOAD DATA LOCAL INFILE '/docker-entrypoint-initdb.d/tracks.csv'
+# INTO TABLE tracks
+# FIELDS TERMINATED BY ',' ENCLOSED BY '"' 
+# LINES TERMINATED BY '\n'
+# IGNORE 1 ROWS;
+# SQL
