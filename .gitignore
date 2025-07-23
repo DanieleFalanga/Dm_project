@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+data/*
+data/artists.csv
+data/tracks.csv
+  .DS_Store
+=======
 mysql/init/tracks.csv
 mysql/init/artists.csv
 mongo/init/tracks.csv
