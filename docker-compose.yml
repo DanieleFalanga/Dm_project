@@ -1,26 +1,37 @@
+version: "3.9"
+
 services:
-  postgres:
-    image: postgres
+  mysql:
+    image: mysql
+    container_name: mysql
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: pass
-      POSTGRES_DB: mydb
+      MYSQL_ROOT_PASSWORD: root   # cambiare in produzione!
+      MYSQL_DATABASE: spotify          # DB di default
+      MYSQL_USER: user             # utente
+      MYSQL_PASSWORD: pass         # password
     ports:
-      - "5432:5432"
+      - "3306:3306"
+    volumes:
+      # volume gestito da Docker -> niente problemi SELinux
+      - mysql_data:/var/lib/mysql
+      # script iniziali (solo lettura) con rilabel SELinux
+      - ./mysql/init:/docker-entrypoint-initdb.d:ro,Z
 
   mongo:
     image: mongo
-    command: ["--bind_ip_all", "--port", "27017"]
+    container_name: mongo
+    restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: pass
+      MONGO_INITDB_DATABASE: spotify
     ports:
       - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo/init:/docker-entrypoint-initdb.d:ro,Z
 
-  MySql:
-    image: mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: pass
-    ports:
-      - "3306:3306"
+volumes:
+  mysql_data:
+  mongo_data:

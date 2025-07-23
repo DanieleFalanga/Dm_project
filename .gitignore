@@ -1,4 +1,13 @@
+<<<<<<< HEAD
 data/*
 data/artists.csv
 data/tracks.csv
   .DS_Store
+=======
+mysql/init/tracks.csv
+mysql/init/artists.csv
+mongo/init/tracks.csv
+mongo/init/artists.csv
+mongo/data/*
+mysql/data/*
+>>>>>>> b172d876dafb0c5380641b96986a75496528c06c
