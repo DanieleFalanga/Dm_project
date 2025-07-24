@@ -5,7 +5,7 @@ import mysql.connector
 conn = mysql.connector.connect(user='user', password='pass', database='spotify')
 cur = conn.cursor()
 
-with open('/Users/matteodefilippis/Desktop/data-management-project/Dm_project/mysql/init/artists_clean.csv', newline='', encoding='utf-8') as infile:
+with open('/home/dans/Documents/Uni/DM_project/mysql/init/artists_clean.csv', newline='', encoding='utf-8') as infile:
     reader = csv.DictReader(infile)
     for row in reader:
         try:
@@ -21,7 +21,7 @@ with open('/Users/matteodefilippis/Desktop/data-management-project/Dm_project/my
                 VALUES (%s, %s, %s, %s, %s)
             """, (
                 row['id'],
-                int(float(row['followers'])),
+                int(row['followers'].split('.')[0]),
                 json.dumps(genres),
                 row['name'],
                 int(row['popularity'])

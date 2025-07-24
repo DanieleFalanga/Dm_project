@@ -1,12 +1,16 @@
 import csv
 import json
 
-with open('/Users/matteodefilippis/Desktop/data-management-project/Dm_project/mysql/init/artists.csv', newline='', encoding='utf-8') as infile, open('/Users/matteodefilippis/Desktop/data-management-project/Dm_project/mysql/init/artists_clean.csv', 'w', newline='', encoding='utf-8') as outfile:
+with open('/home/dans/Documents/Uni/DM_project/mysql/init/artists.csv', newline='', encoding='utf-8') as infile, open('/home/dans/Documents/Uni/DM_project/mysql/init/artists_clean.csv', 'w', newline='', encoding='utf-8') as outfile:
     reader = csv.DictReader(infile)
     writer = csv.DictWriter(outfile, fieldnames=reader.fieldnames)
     writer.writeheader()
 
     for row in reader:
+        # Gestione colonna followers mancante o vuota
+        if not row.get('followers') or row['followers'].strip() == '':
+            row['followers'] = '0'
+
         raw_genres = row['genres'].strip()
         try:
             # Caso ideale: è già JSON valido
