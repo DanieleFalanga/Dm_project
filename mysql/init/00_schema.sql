@@ -6,19 +6,6 @@ CREATE TABLE artists (
   popularity INT
 );
 
-CREATE TABLE genres (
-  id         VARCHAR(255) PRIMARY KEY,
-  name       VARCHAR(25)
-);
-
-CREATE TABLE artist_genres (
-  artist_id           VARCHAR(255),
-  genre_id            VARCHAR(255),
-  PRIMARY KEY (artist_id, genre_id),
-  FOREIGN KEY (artist_id) REFERENCES artists(id),
-  FOREIGN KEY (genre_id)  REFERENCES genres(id)
-);
-
 CREATE TABLE tracks (
   id               VARCHAR(25) PRIMARY KEY,
   name             VARCHAR(255),
