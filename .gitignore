@@ -6,6 +6,8 @@ data/tracks.csv
 =======
 mysql/init/tracks.csv
 mysql/init/artists.csv
+mysql/init/tracks_clean.csv
+mysql/init/artists_clean.csv
 mongo/init/tracks.csv
 mongo/init/artists.csv
 mongo/data/*
