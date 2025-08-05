@@ -1,11 +1,12 @@
 import csv
+import datetime
 import json
 import mysql.connector
-
+import logging
 conn = mysql.connector.connect(user='user', password='pass', database='spotify')
 cur = conn.cursor()
 
-with open('/home/dans/Documents/Uni/DM_project/mysql/init/artists_clean.csv', newline='', encoding='utf-8') as infile:
+with open('/Users/matteodefilippis/Desktop/data-management-project/Dm_project/mysql/init/artists_clean.csv', newline='', encoding='utf-8') as infile:
     reader = csv.DictReader(infile)
     for row in reader:
         try:
@@ -37,7 +38,7 @@ with open('/Users/matteodefilippis/Desktop/data-management-project/Dm_project/my
         except Exception as e:
             print(f"[WARN] TRACK {row['id']}: artists non valido ({row['artists']}). Uso array vuoto. Errore: {e}")
             artists = []
-
+        
         try:
             id_artists = json.loads(row['id_artists'])
         except Exception as e:
@@ -45,11 +46,19 @@ with open('/Users/matteodefilippis/Desktop/data-management-project/Dm_project/my
             id_artists = []
 
         try:
-            # parsing della data (in caso sia vuota o malformata)
+            release_date_raw = row['release_date'].strip()
+            print(f"TRACK {row['id']} — release_date raw: {release_date_raw}")
+
+            # Ignora le release_date non nel formato completo (YYYY-MM-DD)
+            if len(release_date_raw) != 10:
+                print(f"[SKIP] TRACK {row['id']}: release_date incompleta ({release_date_raw})")
+                continue
+
             try:
-                release_date = datetime.strptime(row['release_date'], '%Y-%m-%d').date()
-            except:
-                release_date = None
+                release_date = datetime.datetime.strptime(release_date_raw, '%Y-%m-%d').date()
+            except ValueError:
+                print(f"[SKIP] TRACK {row['id']}: release_date non valida ({release_date_raw})")
+                continue
 
             cur.execute("""
                 INSERT IGNORE INTO tracks (
@@ -73,7 +82,7 @@ with open('/Users/matteodefilippis/Desktop/data-management-project/Dm_project/my
                 int(row['explicit']),
                 json.dumps(artists),
                 json.dumps(id_artists),
-                release_date,
+                str(release_date),
                 float(row['danceability']),
                 float(row['energy']),
                 int(row['key']),
