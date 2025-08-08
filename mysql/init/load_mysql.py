@@ -2,7 +2,6 @@ import csv
 import datetime
 import json
 import mysql.connector
-import logging
 conn = mysql.connector.connect(user='user', password='pass', database='spotify')
 cur = conn.cursor()
 
