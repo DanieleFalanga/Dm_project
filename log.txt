@@ -1,0 +1,9 @@
+1) Modificati i files:
+    artists.csv
+    tracks.csv
+
+In entrambi i file è stata modificata la colonna genres, affinché potesse essere inserita come lista
+JSON. In tracks è stata fatta la stessa cosa con la colonna, id_artists e artists.
+Inoltre sono state modificate le date delle uscite, mettendo solamente l'anno di uscita, questo per facilitare le group by per release date, altrimenti aggregava utilizzando giorno e mese. 
+
+2) 

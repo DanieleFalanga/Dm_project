@@ -28,3 +28,18 @@ CREATE TABLE tracks (
   tempo            FLOAT,
   time_signature   TINYINT
 );
+
+
+
+-- TODO: Eseguire la query sottostante dopo aver runnato i container
+-- CREATE TABLE tracks_artists AS
+-- SELECT 
+--   t.id         AS track_id,
+--   t.name       AS track_name,
+--   a.id         AS artist_id,
+--   a.name       AS artist_name
+-- FROM tracks t
+-- JOIN JSON_TABLE(t.id_artists, '$[*]' COLUMNS(artist_id VARCHAR(25) PATH '$')) AS ta
+--   ON TRUE
+-- JOIN artists a 
+--   ON a.id = ta.artist_id;

@@ -15,5 +15,7 @@ mysql/data/*
 mysql/init/script.py
 genres.csv
 venv
-files/modified/*
-files/original_files/*
+files/modified/artists.csv
+files/modified/tracks.csv
+files/original_files/artists.csv
+files/original_files/tracks.csv
