@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import json
 import ast
 
@@ -15,8 +14,8 @@ def fix_columns_to_JSON(val):
 
 def convert_to_JSON(df_tracks, df_artists):
     df_artists['genres'] = df_artists['genres'].apply(fix_columns_to_JSON)
-    df_tracks['artists'] = df_artists['genres'].apply(fix_columns_to_JSON)
-    df_tracks['id_artists'] = df_artists['genres'].apply(fix_columns_to_JSON)
+    df_tracks['artists'] = df_tracks['artists'].apply(fix_columns_to_JSON)
+    df_tracks['id_artists'] = df_tracks['id_artists'].apply(fix_columns_to_JSON)
     
 
 def eliminate_month_day(df_tracks):

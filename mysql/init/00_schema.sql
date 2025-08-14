@@ -6,6 +6,7 @@ CREATE TABLE artists (
   popularity INT
 );
 
+
 CREATE TABLE tracks (
   id               VARCHAR(25) PRIMARY KEY,
   name             VARCHAR(255),
