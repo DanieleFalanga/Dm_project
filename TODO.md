@@ -12,6 +12,9 @@ Nota MySQL: se `tracks.artist_id` è JSON array, usa `JSON_TABLE` o tabella pont
 Obiettivo: filtro + sort + limit.
 Indici: `tracks(artist_id, popularity DESC)` • Mongo: `{artist_id:1, popularity:-1}`.
 
-- [ ] **Q3. MIglior Genere per ogni anno con un numero minimo di canzoni di 200**  
+- [X] **Q3. MIglior Genere per ogni anno con un numero minimo di canzoni di 200**  
 
-Per ogni query, fare almeno 6/7 run in modo da riempire la cache e far si che gli output siano piu affidabili. 
+Per ogni query, fare almeno 6/7 run in modo da riempire la cache e far si che gli output siano piu affidabili. ù
+
+
+
