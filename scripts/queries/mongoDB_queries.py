@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from pymongo.errors import ExecutionTimeout
 import time
 import pandas as pd
+import psutil
 
 # === Config ===
 uri = "mongodb://root:pass@localhost:27017/"
@@ -17,7 +18,21 @@ artists = db["artists"]
 tracks = db["tracks_info"]
 genres_artist = db["genres_artist"]
 
-# === Pipelines (le tue) ===
+# === Funzione per ottenere il processo mongod ===
+def get_mongo_process():
+    for p in psutil.process_iter(['name']):
+        try:
+            if p.info['name'] and 'mongod' in p.info['name']:
+                print(f"Trovato processo MongoDB: PID {p.pid}")
+                return p
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+    raise RuntimeError("Processo mongod non trovato! Assicurati che MongoDB sia in esecuzione.")
+
+# === Ottieni il processo MongoDB ===
+mongo_proc = get_mongo_process()
+
+# === Pipelines ===
 pipeline_Q1 = [
     {"$match": {"popularity": {"$ne": None}}},
     {"$unwind": "$id_artists"},
@@ -58,11 +73,11 @@ pipeline_Q3 = [
 pipelines = {
     "Q1_top_artists_by_avg_pop": pipeline_Q1,
     "Q2_eminem_solo_tracks": pipeline_Q2,
-    "Q3_top_genre_per_year": pipeline_Q3,  # questa è quella lenta
+    "Q3_top_genre_per_year": pipeline_Q3,
 }
 
+# === Funzione di esecuzione fase (senza/con indici) ===
 def run_phase(label: str, create_indexes: bool = False):
-    # opzionale: crea indici per la fase "withIndex"
     created = []
     if create_indexes:
         created = [
@@ -72,44 +87,42 @@ def run_phase(label: str, create_indexes: bool = False):
             genres_artist.create_index([("id", 1)]),
         ]
 
-    # matrici
-    execution_times = {name: [] for name in pipelines.keys()}
-    outputs = {name: [] for name in pipelines.keys()}
+    execution_data = []
 
-    # esecuzione con timeout
     for name, pipe in pipelines.items():
         for run_idx in range(runs_per_pipeline):
             try:
                 t0 = time.perf_counter()
                 cursor = tracks.aggregate(pipe, allowDiskUse=True, maxTimeMS=TIMEOUT_MS)
-                docs = list(cursor)  # se supera TIMEOUT_MS solleva ExecutionTimeout
+                docs = list(cursor)
                 t1 = time.perf_counter()
                 exec_ms = (t1 - t0) * 1000.0
-                print(f"{label} | {name} - run {run_idx+1}/{runs_per_pipeline}: {exec_ms:.2f} ms | rows={len(docs)}")
+
+                # Misura memoria totale del processo mongod in KB
+                mem_used_kb = mongo_proc.memory_info().rss / 1024
+
+                print(f"{label} | {name} - run {run_idx+1}/{runs_per_pipeline}: "
+                      f"{exec_ms:.2f} ms | Mem: {mem_used_kb/1024:.2f} MB | rows={len(docs)}")
+
             except ExecutionTimeout:
-                # timeout: assegna 10 minuti esatti e risultato vuoto (o un sentinel)
                 exec_ms = float(TIMEOUT_MS)
+                mem_used_kb = mongo_proc.memory_info().rss / 1024
                 docs = []
                 print(f"{label} | {name} - run {run_idx+1}/{runs_per_pipeline}: TIMEOUT (>= {TIMEOUT_MS} ms)")
+
             except Exception as e:
-                # opzionale: in caso di errore non previsto, marca come NaN
                 exec_ms = float('nan')
+                mem_used_kb = mongo_proc.memory_info().rss / 1024
                 docs = []
                 print(f"{label} | {name} - run {run_idx+1}: ERROR -> {e}")
 
-            execution_times[name].append(exec_ms)
-            outputs[name].append(docs)
+            execution_data.append([name, run_idx+1, exec_ms, mem_used_kb, len(docs)])
 
-    # dataframe matrice
-    df_times = pd.DataFrame.from_dict(
-        execution_times, orient="index",
-        columns=[f"run_{i+1}" for i in range(runs_per_pipeline)]
-    )
-    print(df_times)
-
-    # salvataggi
-    df_times.to_csv(f"{dst_for_results}Mongo_{label}_times.csv", index=True)
-    pd.to_pickle(outputs, f"{dst_for_results}Mongo_{label}_outputs.pkl")
+    # === Salvataggio risultati ===
+    df_perf = pd.DataFrame(execution_data,
+                           columns=["Query", "Run", "ExecutionTime_ms", "MongoMemoryUsed_KB", "NumDocs"])
+    df_perf.to_csv(f"{dst_for_results}Mongo_{label}_perf.csv", index=False)
+    print(df_perf)
 
     # cleanup indici se creati
     if create_indexes and created:
@@ -126,9 +139,15 @@ def run_phase(label: str, create_indexes: bool = False):
         except Exception:
             pass
 
-# === Fasi: senza indici e con indici ===
+# === Fasi ===
+print("\n--- Esecuzione senza indici ---")
 run_phase(label="noIndex", create_indexes=False)
+
+print("\n--- Esecuzione con indici ---")
 run_phase(label="withIndex", create_indexes=True)
 
 # === Chiusura ===
 client.close()
+print("\n✅ Test completato. Risultati salvati in:")
+print(" - Mongo_noIndex_perf.csv")
+print(" - Mongo_withIndex_perf.csv")
